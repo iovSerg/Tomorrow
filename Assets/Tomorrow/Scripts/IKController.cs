@@ -79,28 +79,15 @@ namespace Tomorrow
 
 		private void Update()
 		{
-			if(_drawWeapon && !_hideWeapon)
-			{
-				if(_rightHandWeight < 1f)
-				{
-					_leftHandWeight += Time.deltaTime / _aimDuration;
-					_rightHandWeight += Time.deltaTime / _aimDuration;
-				}
+			DrawWeapon();
+			HideWeapon();
+		}
 
-				if (_rightHandWeight > 0.9f)
-				{
-					TransformLerp(rightHandTarget, rightHand, _drawDuration);
-					TransformLerp(leftHandTarget, leftHand, _drawDuration);
-					if (_isStartCourutine)
-					{
-						weaponController.EquipWeapon(true);
-						_isStartCourutine = false;
-						StartCoroutine(HideDrawWeapon());
-					}
-				}
-			}
+		private void HideWeapon()
+		{
 			if (_hideWeapon && !_drawWeapon)
 			{
+				weaponController.IsEquip = false;
 				TransformLerp(rightHandTarget, rightHolderPosition, _drawDuration);
 				TransformLerp(leftHandTarget, leftHolderPosition, _drawDuration);
 				if (_isStartCourutine)
@@ -119,8 +106,33 @@ namespace Tomorrow
 			}
 		}
 
+		private void DrawWeapon()
+		{
+			if (_drawWeapon && !_hideWeapon)
+			{
+				if (_rightHandWeight < 1f)
+				{
+					_leftHandWeight += Time.deltaTime / _aimDuration;
+					_rightHandWeight += Time.deltaTime / _aimDuration;
+				}
+
+				if (_rightHandWeight > 0.9f)
+				{
+					TransformLerp(rightHandTarget, rightHand, _drawDuration);
+					TransformLerp(leftHandTarget, leftHand, _drawDuration);
+					if (_isStartCourutine)
+					{
+						weaponController.IsEquip = true;
+						weaponController.EquipWeapon(true);
+						_isStartCourutine = false;
+						StartCoroutine(HideDrawWeapon());
+					}
+				}
+			}
+		}
 		private IEnumerator HideDrawWeapon()
 		{
+			
 			yield return new WaitForSeconds(_timeLerp);
 			_drawWeapon = _drawWeapon ? false : _drawWeapon;
 			if(_hideWeapon)
